@@ -111,9 +111,9 @@ class LinkPreview extends StatelessWidget {
 
   void _launchURL() async {
     final parsedUrl = Uri.parse(url);
-    if (url.startsWith("https://www.google.com/maps")) {
-      if (await canLaunch("googlemaps://?q=${parsedUrl.query}")) {
-        await launch("googlemaps://?q=${parsedUrl.query}");
+    if (url.startsWith("https://www.google.com/maps/dir/?api=1")) {
+      if (await canLaunch("googlemaps://?api=1&destination=${parsedUrl.queryParameters['destination']}")) {
+        await launch("googlemaps://?api=1&destination=${parsedUrl.queryParameters['destination']}");
         return;
       } else {
         if (await canLaunch(url)) {
