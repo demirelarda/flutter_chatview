@@ -110,24 +110,21 @@ class LinkPreview extends StatelessWidget {
   }
 
   void _launchURL() async {
-    final parsedUrl = Uri.parse(url);
-    if (url.startsWith("https://www.google.com/maps/dir/?api=1")) {
-      if (await canLaunch("googlemaps://?api=1&destination=${parsedUrl.queryParameters['destination']}")) {
-        await launch("googlemaps://?api=1&destination=${parsedUrl.queryParameters['destination']}");
+    print("running launch url function");
+    if (url.contains("https://www.google.com/maps/dir/?api=1&destination=")) {
+      final googleMapsUrl = url.replaceFirst(
+          "https://www.google.com/maps/dir/?api=1&destination=",
+          "geo:${url.split('destination=').last}");
+      if (await canLaunch(googleMapsUrl)) {
+        await launch(googleMapsUrl);
         return;
-      } else {
-        if (await canLaunch(url)) {
-          await launch(url);
-          return;
-        } else {
-          throw "Couldn't launch URL: $url";
-        }
       }
     }
     if (await canLaunch(url)) {
       await launch(url);
     } else {
-      throw "Couldn't launch URL: $url";
+      print("error couldnt launch $url");
+      throw 'Could not launch $url';
     }
   }
 }
