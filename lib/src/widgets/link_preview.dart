@@ -53,36 +53,36 @@ class LinkPreview extends StatelessWidget {
             padding: const EdgeInsets.symmetric(vertical: verticalPadding),
             child: url.isImageUrl
                 ? InkWell(
-                    onTap: _onLinkTap,
-                    child: Image.network(
-                      url,
-                      height: 120,
-                      width: double.infinity,
-                      fit: BoxFit.fitWidth,
-                    ),
-                  )
+              onTap: _onLinkTap,
+              child: Image.network(
+                url,
+                height: 120,
+                width: double.infinity,
+                fit: BoxFit.fitWidth,
+              ),
+            )
                 : AnyLinkPreview(
-                    link: url,
-                    removeElevation: true,
-                    proxyUrl: linkPreviewConfig?.proxyUrl,
-                    onTap: _onLinkTap,
-                    placeholderWidget: SizedBox(
-                      height: MediaQuery.of(context).size.height * 0.25,
-                      width: double.infinity,
-                      child: Center(
-                        child: CircularProgressIndicator(
-                          strokeWidth: 1,
-                          color: linkPreviewConfig?.loadingColor,
-                        ),
-                      ),
-                    ),
-                    backgroundColor: linkPreviewConfig?.backgroundColor ??
-                        Colors.grey.shade200,
-                    borderRadius: linkPreviewConfig?.borderRadius,
-                    bodyStyle: linkPreviewConfig?.bodyStyle ??
-                        const TextStyle(color: Colors.black),
-                    titleStyle: linkPreviewConfig?.titleStyle,
+              link: url,
+              removeElevation: true,
+              proxyUrl: linkPreviewConfig?.proxyUrl,
+              onTap: _onLinkTap,
+              placeholderWidget: SizedBox(
+                height: MediaQuery.of(context).size.height * 0.25,
+                width: double.infinity,
+                child: Center(
+                  child: CircularProgressIndicator(
+                    strokeWidth: 1,
+                    color: linkPreviewConfig?.loadingColor,
                   ),
+                ),
+              ),
+              backgroundColor: linkPreviewConfig?.backgroundColor ??
+                  Colors.grey.shade200,
+              borderRadius: linkPreviewConfig?.borderRadius,
+              bodyStyle: linkPreviewConfig?.bodyStyle ??
+                  const TextStyle(color: Colors.black),
+              titleStyle: linkPreviewConfig?.titleStyle,
+            ),
           ),
           const SizedBox(height: verticalPadding),
           InkWell(
@@ -111,19 +111,23 @@ class LinkPreview extends StatelessWidget {
 
   void _launchURL() async {
     final parsedUrl = Uri.parse(url);
-    if (parsedUrl.scheme == "intent") {
-      if (await canLaunch(url)) {
-        await launch(url, forceSafariVC: false, forceWebView: false);
+    if (url.startsWith("https://www.google.com/maps")) {
+      if (await canLaunch("googlemaps://?q=${parsedUrl.query}")) {
+        await launch("googlemaps://?q=${parsedUrl.query}");
+        return;
       } else {
-        await canLaunchUrl(parsedUrl)
-            ? await launchUrl(parsedUrl)
-            : throw couldNotLunch;
+        if (await canLaunch(url)) {
+          await launch(url);
+          return;
+        } else {
+          throw "Couldn't launch URL: $url";
+        }
       }
+    }
+    if (await canLaunch(url)) {
+      await launch(url);
     } else {
-      await canLaunchUrl(parsedUrl)
-          ? await launchUrl(parsedUrl)
-          : throw couldNotLunch;
+      throw "Couldn't launch URL: $url";
     }
   }
-
 }
